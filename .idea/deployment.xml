@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="ubuntu@152.32.132.203:22 password">
+    <serverData>
+      <paths name="ubuntu@152.32.132.203:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/ubuntu/website/zanhu" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="zanhu">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/zanhu" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/venv" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

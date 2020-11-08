@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="25644be0-0841-462b-bfc8-eb27bdae207d" name="zanhu" url="http://152.32.132.203">
+        <fileTransfer rootFolder="/home/ubuntu/website" accessType="SFTP" host="152.32.132.203" port="22" sshConfigId="b5782ba9-f83c-427b-8ab2-9028413f0ca3" sshConfig="ubuntu@152.32.132.203:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
