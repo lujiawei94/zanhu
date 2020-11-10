@@ -1,8 +1,9 @@
 from test_plus.test import TestCase
+
 from django.urls import reverse, resolve
 
 
-class TestUserURLs(TestCase):
+class TestUserUrls(TestCase):
 
     def setUp(self):
         self.user = self.make_user()

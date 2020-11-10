@@ -8,7 +8,6 @@ class BaseUserTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.user = self.make_user()
-        self.User = User()  # !
 
 
 class TestUserUpdateView(BaseUserTestCase):
@@ -24,7 +23,7 @@ class TestUserUpdateView(BaseUserTestCase):
         self.assertEqual(self.view.get_success_url(), '/users/testuser/')
 
     def test_get_object(self):
-        self.assertEqual(self.view.get_object(), self.User.objects.get(username=self.view.request.user.username))
+        self.assertEqual(self.view.get_object(), User.objects.get(username=self.view.request.user.username))
 
 
 class TestUserRedirectView(BaseUserTestCase):
