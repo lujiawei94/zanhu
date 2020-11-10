@@ -1,79 +1,37 @@
-import pytest
-from django.contrib.auth.models import AnonymousUser
-from django.http.response import Http404
 from django.test import RequestFactory
+from test_plus.test import TestCase
+from zanhu.users.views import UserUpdateView, UserRedirectView
+from zanhu.users.models import User  # !
 
-from zanhu.users.models import User
-from zanhu.users.tests.factories import UserFactory
-from zanhu.users.views import (
-    UserRedirectView,
-    UserUpdateView,
-    user_detail_view,
-)
+class BaseUserTestCase(TestCase):
 
-pytestmark = pytest.mark.django_db
-
-
-class TestUserUpdateView:
-    """
-    TODO:
-        extracting view initialization code as class-scoped fixture
-        would be great if only pytest-django supported non-function-scoped
-        fixture db access -- this is a work-in-progress for now:
-        https://github.com/pytest-dev/pytest-django/pull/258
-    """
-
-    def test_get_success_url(self, user: User, rf: RequestFactory):
-        view = UserUpdateView()
-        request = rf.get("/fake-url/")
-        request.user = user
-
-        view.request = request
-
-        assert view.get_success_url() == f"/users/{user.username}/"
-
-    def test_get_object(self, user: User, rf: RequestFactory):
-        view = UserUpdateView()
-        request = rf.get("/fake-url/")
-        request.user = user
-
-        view.request = request
-
-        assert view.get_object() == user
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = self.make_user()
+        self.User = User()  # !
 
 
-class TestUserRedirectView:
-    def test_get_redirect_url(self, user: User, rf: RequestFactory):
-        view = UserRedirectView()
-        request = rf.get("/fake-url")
-        request.user = user
+class TestUserUpdateView(BaseUserTestCase):
 
-        view.request = request
+    def setUp(self):
+        super().setUp()
+        self.view = UserUpdateView()
+        request = self.factory.get('/fake-url')
+        request.user = self.user
+        self.view.request = request
 
-        assert view.get_redirect_url() == f"/users/{user.username}/"
+    def test_get_success_url(self):
+        self.assertEqual(self.view.get_success_url(), '/users/testuser/')
+
+    def test_get_object(self):
+        self.assertEqual(self.view.get_object(), self.User.objects.get(username=self.view.request.user.username))
 
 
-class TestUserDetailView:
-    def test_authenticated(self, user: User, rf: RequestFactory):
-        request = rf.get("/fake-url/")
-        request.user = UserFactory()
+class TestUserRedirectView(BaseUserTestCase):
 
-        response = user_detail_view(request, username=user.username)
+    def setUp(self):
+        super().setUp()
+        self.view = UserRedirectView()
 
-        assert response.status_code == 200
-
-    def test_not_authenticated(self, user: User, rf: RequestFactory):
-        request = rf.get("/fake-url/")
-        request.user = AnonymousUser()
-
-        response = user_detail_view(request, username=user.username)
-
-        assert response.status_code == 302
-        assert response.url == "/accounts/login/?next=/fake-url/"
-
-    def test_case_sensitivity(self, rf: RequestFactory):
-        request = rf.get("/fake-url/")
-        request.user = UserFactory(username="UserName")
-
-        with pytest.raises(Http404):
-            user_detail_view(request, username="username")
+    def test_get_redirect_url(self):
+        self.assertEqual(self.view.get_redirect_url(), '/users/testuser/')
