@@ -7,6 +7,7 @@ from django.db import models
 
 @python_2_unicode_compatible
 class News(models.Model):
+
     uuid_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL,
                              related_name='publisher', verbose_name='用户')

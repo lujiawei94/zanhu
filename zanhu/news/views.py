@@ -1,7 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
-from zanhu.news.models import News
+from django.views.generic import ListView, DeleteView
+from django.template.loader import render_to_string
+from django.http.response import HttpResponse, HttpResponseBadRequest
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.urls import reverse_lazy
 
+from zanhu.news.models import News
+from zanhu.helpers import ajax_required, AuthorRequireMixin
 
 class NewsListView(LoginRequiredMixin, ListView):
     model = News
@@ -22,4 +28,24 @@ class NewsListView(LoginRequiredMixin, ListView):
     #     context['views'] = 100
     #     return context  # 除了过滤后的数据，还包含了views
 
+class NewsDeleteView(LoginRequiredMixin, AuthorRequireMixin, DeleteView):
+    model = News
+    template_name = 'news/news_confirm_delete.html'
+    # slug_url_kwarg = 'slug'  # 通过url传入要删除的对象主键id，默认为slug
+    # pk_url_kwarg = 'pk'  # 通过url传入要删除的对象主键id，默认为pk
+    success_url = reverse_lazy('news:list')  # 删除后跳转的路径 reverse_lazy(在项目URLConf未加载前使用)
+
+
+@login_required
+@ajax_required
+@require_http_methods(['POST'])
+def post_new(request):
+    """发送动态，ajax post请求"""
+    post = request.POST['post'].strip()
+    if post:
+        posted = News.objects.create(user=request.user, content=post)
+        html = render_to_string('news/news_single.html', {'news': posted, 'request': request})
+        return HttpResponse(html)
+    else:
+        return HttpResponseBadRequest('内容不能为空！')
 
