@@ -1,13 +1,14 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DeleteView
 from django.template.loader import render_to_string
-from django.http.response import HttpResponse, HttpResponseBadRequest
+from django.http.response import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.urls import reverse_lazy
 
 from zanhu.news.models import News
 from zanhu.helpers import ajax_required, AuthorRequireMixin
+
 
 class NewsListView(LoginRequiredMixin, ListView):
     model = News
@@ -27,6 +28,7 @@ class NewsListView(LoginRequiredMixin, ListView):
     #     context = super().get_context_data()
     #     context['views'] = 100
     #     return context  # 除了过滤后的数据，还包含了views
+
 
 class NewsDeleteView(LoginRequiredMixin, AuthorRequireMixin, DeleteView):
     model = News
@@ -49,3 +51,43 @@ def post_new(request):
     else:
         return HttpResponseBadRequest('内容不能为空！')
 
+
+@login_required
+@ajax_required
+@require_http_methods(['POST'])
+def like(request):
+    """点赞， AJAX POST 请求"""
+    news_id = request.POST['news']
+    news = News.objects.get(pk=news_id)
+    news.switch_like(request.user)
+    return JsonResponse({'likes': news.count_likers()})
+
+
+@login_required
+@ajax_required
+@require_http_methods(['GET'])
+def get_thread(request):
+    """获取动态评论，AJAX GET请求"""
+    news_id = request.GET['news']
+    news = News.objects.get(pk=news_id)
+    news_html = render_to_string('news/news_single.html', {'news': news})  # 没有评论时
+    thread_html = render_to_string('news/news_thread.html', {'thread': news.get_thread()})
+    return JsonResponse({
+        'uuid': news_id,
+        'news': news_html,
+        'thread': thread_html
+    })
+
+
+@login_required
+@ajax_required
+@require_http_methods(['POST'])
+def post_comment(request):
+    """评论，AJAX POST请求"""
+    post = request.POST['reply'].strip()
+    parent_id = request.POST['parent']
+    parent = News.objects.get(pk=parent_id)
+    if post:
+        parent.reply_this(request.user, post)
+        return JsonResponse({'comments': parent.comment_count()})
+    return HttpResponseBadRequest('评论不能为空')
