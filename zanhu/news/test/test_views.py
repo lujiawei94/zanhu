@@ -2,11 +2,9 @@ from django.test import Client
 from test_plus.test import TestCase
 from django.urls import reverse
 from zanhu.news.models import News
-from zanhu.news.views import NewsListView, NewsDeleteView
 
 
 class NewsViewsTest(TestCase):
-
     def setUp(self):
         self.user = self.make_user('user01')
         self.other_user = self.make_user('user02')
