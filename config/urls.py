@@ -7,17 +7,20 @@ from django.views.generic import TemplateView
 from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    path(
-        "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
-    ),
+                  path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+                  path(
+                      "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
+                  ),
 
-    # User management
-    path("users/", include("zanhu.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
-    # Your stuff: custom urls includes go here
-    path('news/', include('zanhu.news.urls', namespace='news')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  # User management
+                  path("users/", include("zanhu.users.urls", namespace="users")),
+                  path("accounts/", include("allauth.urls")),
+                  # third party app
+                  path('markdownx/', include('markdownx.urls')),
+                  # Your stuff: custom urls includes go here
+                  path('news/', include('zanhu.news.urls', namespace='news')),
+                  path('articles/', include('zanhu.articles.urls', namespace='articles')),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development
     urlpatterns += staticfiles_urlpatterns()
