@@ -1,13 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DeleteView, UpdateView, CreateView
 from django.urls import reverse_lazy
-from django.contrib import  messages
-from django.http.response import JsonResponse, HttpResponseBadRequest, HttpResponse
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from zanhu.articles.models import Article
-from zanhu.helpers import ajax_required
 from zanhu.articles.forms import ArticleForm
 
 class ArticlesListView(LoginRequiredMixin, ListView):
@@ -36,7 +32,7 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
     """用户发表文章"""
     model = Article
     form_class = ArticleForm
-    template_name = 'articles.article_create.html'
+    template_name = 'articles/article_create.html'
     message = '您的文章创建成功'  # 消息器指示
     initial = {'title': '文章标题初始化'}  # 固定初始化字段，get_initail 动态化
 
