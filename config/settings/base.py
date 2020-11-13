@@ -88,7 +88,6 @@ LOCAL_APPS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-
 # 更改查找widget模板的顺序，先自定义的模板，后系统默认模板
 FROM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
