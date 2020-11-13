@@ -62,9 +62,8 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.humanize", # Handy template tags
-    # "django.contrib.admin",
-    "django.forms",
+    "django.contrib.humanize",  # Handy template tags
+    "django.forms",  # 用于后面重写widget模板
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
@@ -78,15 +77,20 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "sorl.thumbnail",
+    "taggit",
+    "markdownx",
 ]
 
 LOCAL_APPS = [
     "zanhu.users.apps.UsersConfig",
     "zanhu.news.apps.NewsConfig"
-    # Your stuff: custom apps go here
+    "zanhu.articles.app.ArticlesConfig"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# 更改查找widget模板的顺序，先自定义的模板，后系统默认模板
+FROM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
@@ -233,7 +237,6 @@ DEFAULT_FROM_EMAIL = env('DJANGO_DEFAULT_FROM_EMAIL')
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
 EMAIL_TIMEOUT = 5
 
-
 # LOGGING
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#logging
@@ -245,7 +248,7 @@ LOGGING = {
     "formatters": {
         "verbose": {
             "format": "%(levelname)s %(asctime)s %(module)s "
-            "%(process)d %(thread)d %(message)s"
+                      "%(process)d %(thread)d %(message)s"
         }
     },
     "handlers": {
@@ -316,3 +319,5 @@ REST_FRAMEWORK = {
 CORS_URLS_REGEX = r"^/api/.*$"
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+MARKDOWNX_SERVER_CALL_LATENCY = 1000
