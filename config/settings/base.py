@@ -79,6 +79,7 @@ THIRD_PARTY_APPS = [
     "sorl.thumbnail",
     "taggit",
     "markdownx",
+    "django_comments"
 ]
 
 LOCAL_APPS = [
@@ -319,4 +320,3 @@ CORS_URLS_REGEX = r"^/api/.*$"
 # Your stuff...
 # ------------------------------------------------------------------------------
 
-MARKDOWNX_SERVER_CALL_LATENCY = 1000

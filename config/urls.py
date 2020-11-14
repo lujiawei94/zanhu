@@ -16,6 +16,7 @@ urlpatterns = [
                   path("users/", include("zanhu.users.urls", namespace="users")),
                   path("accounts/", include("allauth.urls")),
                   # third party app
+                  path('comments/', include('django_comments.urls')),
                   path('markdownx/', include('markdownx.urls')),
                   # Your stuff: custom urls includes go here
                   path('news/', include('zanhu.news.urls', namespace='news')),

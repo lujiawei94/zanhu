@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DeleteView, UpdateView, CreateView
+from django.views.generic import ListView, DeleteView, UpdateView, CreateView, DetailView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
 from zanhu.articles.models import Article
 from zanhu.articles.forms import ArticleForm
+from zanhu.helpers import AuthorRequireMixin
 
 class ArticlesListView(LoginRequiredMixin, ListView):
     """已发布的文章列表"""
@@ -49,3 +50,25 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
         initial = super().get_initial()
         pass  # 动态初始化逻辑代码
         return initial
+
+
+class ArticleDetailView(LoginRequiredMixin, DetailView):
+    """文章详情"""
+    model = Article
+    template_name = 'articles/article_detail.html'
+
+
+class ArticleEditView(LoginRequiredMixin, AuthorRequireMixin, UpdateView):
+    """文章编辑"""
+    model = Article
+    template_name = 'articles/article_update.html'
+    message = '文章编辑成功'
+    form_class = ArticleForm
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        messages.success(self.request, self.message)
+        return reverse_lazy('articles:article', kwargs={"slug": self.get_object().slug})
