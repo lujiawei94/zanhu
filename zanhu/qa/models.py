@@ -17,7 +17,8 @@ from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKe
 class Vote(models.Model):
     """使用django中的contentType，创建genericForeignKEY, 同时关联多个表（用户的问题和回答的投票）"""
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='qa_vote', verbose_name='用户')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='qa_vote',
+                             verbose_name='用户')
     value = models.BooleanField(default=True, verbose_name='是否赞同')
     #  genericForeignKey的设置
     content_type = models.ForeignKey(ContentType, related_name='votes_on', on_delete=models.CASCADE)
@@ -33,6 +34,7 @@ class Vote(models.Model):
         unique_together = ('user', 'content_type', 'object_id')  # 联合唯一键
         # SQL优化
         index_together = ('content_type', 'object_id')  # 联合唯一索引
+
 
 @python_2_unicode_compatible
 class QuestionQuerrySet(models.query.QuerySet):
@@ -65,7 +67,6 @@ class QuestionQuerrySet(models.query.QuerySet):
 
 @python_2_unicode_compatible
 class Question(models.Model):
-
     STATUS = (
         ('O', 'Open'),
         ('C', 'Close'),
@@ -94,7 +95,7 @@ class Question(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-           self.slug = slugify(self.title)
+            self.slug = slugify(self.title)
         super(Question, self).save(*args, **kwargs)
 
     def get_markdown(self):
@@ -111,7 +112,7 @@ class Question(models.Model):
 
     def count_answers(self):
         """总回答数"""
-        return self.get_answers.count()
+        return self.get_answers().count()
 
     def get_upvoters(self):
         """赞成的人"""
