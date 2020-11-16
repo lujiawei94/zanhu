@@ -28,22 +28,22 @@ class QAModelsTest(TestCase):
         )
 
     def test_can_vote_question(self):
-        self.question_one.votes.update_or_create(user=self.user, default={'value': True})
-        self.question_one.votes.update_or_create(user=self.other_user, default={'value': True})
+        self.question_one.votes.update_or_create(user=self.user, defaults={'value': True})
+        self.question_one.votes.update_or_create(user=self.other_user, defaults={'value': True})
         assert self.question_one.total_votes() == 2
     def test_can_vote_answer(self):
-        self.answer.votes.update_or_create(user=self.user, default={'value': True})
-        self.answer.votes.update_or_create(user=self.other_user, default={'value': True})
+        self.answer.votes.update_or_create(user=self.user, defaults={'value': True})
+        self.answer.votes.update_or_create(user=self.other_user, defaults={'value': True})
         assert self.answer.total_votes() == 2
     def test_get_question_voters(self):
-        self.question_one.votes.update_or_create(user=self.user, default={'value': True})
-        self.question_one.votes.update_or_create(user=self.other_user, default={'value': False})
+        self.question_one.votes.update_or_create(user=self.user, defaults={'value': True})
+        self.question_one.votes.update_or_create(user=self.other_user, defaults={'value': False})
         assert self.user in self.question_one.get_upvoters()
         assert self.other_user in self.question_one.get_downvoters()
 
     def test_get_answer_voters(self):
-        self.answer.votes.update_or_create(user=self.user, default={'value': True})
-        self.answer.votes.update_or_create(user=self.other_user, default={'value': False})
+        self.answer.votes.update_or_create(user=self.user, defaults={'value': True})
+        self.answer.votes.update_or_create(user=self.other_user, defaults={'value': False})
         assert self.user in self.answer.get_upvoters()
         assert self.other_user in self.answer.get_downvoters()
 
@@ -87,6 +87,6 @@ class QAModelsTest(TestCase):
         assert str(self.question_one) == '问题1'
 
     def test_answer_str_(self):
-        assert isinstance(self.answer, Question)
+        assert isinstance(self.answer, Answer)
         assert str(self.answer) == '问题2正确答案'
 

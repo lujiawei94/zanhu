@@ -129,7 +129,7 @@ class Question(models.Model):
 
 @python_2_unicode_compatible
 class Answer(models.Model):
-    uudi_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uuid_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, max_length=255, related_name='a_author',
                              on_delete=models.CASCADE, verbose_name='回答者')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='问题')  # ?
@@ -171,7 +171,7 @@ class Answer(models.Model):
         self.is_answer = True
         self.save()
         self.question.has_answer = True
-        self.save()
+        self.question.save()
 
 
 """

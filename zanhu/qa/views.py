@@ -99,11 +99,12 @@ def question_vote(request):
     value = True if request.POST['value'] == 'U' else False
     question = Question.objects.get(pk=question_id)
     users = question.votes.values_list('user', flat=True)  # 当前问题所有投票用户
-    if request.user.pk in users and (question.votes.get(uesr=request.user).value == value):  # 取消赞或踩
+    if request.user.pk in users and (question.votes.get(user=request.user).value == value):  # 取消赞或踩
         question.votes.get(user=request.user).delete()
     else:  # 新赞或踩，更改赞为踩，更改踩为赞
         question.votes.update_or_create(user=request.user, defaults={'value': value})
     return JsonResponse({"votes": question.total_votes()})
+
 
 @login_required
 @ajax_required
@@ -115,7 +116,7 @@ def answer_vote(request):
     value = True if request.POST['value'] == 'U' else False
     answer = Answer.objects.get(pk=answer_id)
     users = answer.votes.values_list('user', flat=True)  # 当前问题所有投票用户
-    if request.user.pk in users and (answer.votes.get(uesr=request.user).value == value):  # 取消赞或踩
+    if request.user.pk in users and (answer.votes.get(user=request.user).value == value):  # 取消赞或踩
         answer.votes.get(user=request.user).delete()
     else:  # 新赞或踩，更改赞为踩，更改踩为赞
         answer.votes.update_or_create(user=request.user, defaults={'value': value})
