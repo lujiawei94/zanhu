@@ -48,7 +48,7 @@
                 {% endif %}
             </div>
         </div>
-        <a href="#" class="btn btn-primary pull-right" role="button">提交回答</a>
+        <a href="{% url 'qa:propose_answer' question.pk %}" class="btn btn-primary pull-right" role="button">提交回答</a>
     </div>
 
     <div class="page-header">
