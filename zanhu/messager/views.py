@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
@@ -5,6 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
+from django.template.loader import render_to_string
+
+from channels.layers import get_channel_layer
 
 from zanhu.messager.models import Message
 from zanhu.helpers import ajax_required
@@ -41,7 +46,6 @@ class ConversationListView(MessagesListView):
         active_user = get_object_or_404(get_user_model(), username=self.kwargs['username'])
         return Message.objects.get_conversation(self.request.user, active_user)
 
-
 @login_required
 @ajax_required
 @require_http_methods(['POST'])
@@ -56,6 +60,15 @@ def send_message(request):
             recipient=recipient,
             message=message,
         )
+
+        channel_layer = get_channel_layer()
+        payload = {
+            'type': 'receive',
+            'message': render_to_string('messager/single_message.html', {'message': msg}),
+            'sender': sender.username,
+        }
+        async_to_sync(channel_layer.group_send)(recipient_username, payload)
+
         return render(request, 'messager/single_message.html', {'message': msg})
     return HttpResponse()
 
