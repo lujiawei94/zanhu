@@ -12,11 +12,11 @@ application = ProtocolTypeRouter({
     'websocket': AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter([
-                path('wa/<str:username>/', MessagesConsumer),
+                path('ws/<str:username>/', MessagesConsumer),
                 # 可以通过self.scope['url_route']['kwargs']['username'] 获取url中的关键字参数
             ])
         )
-    ),
+    )
   # 'http': views相关,  # 普通http协议默认会加载
 })
 

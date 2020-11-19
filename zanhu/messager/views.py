@@ -18,7 +18,6 @@ from zanhu.helpers import ajax_required
 class MessagesListView(LoginRequiredMixin, ListView):
     model = Message
     template_name = 'messager/message_list.html'
-    paginate_by = 10
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(MessagesListView, self).get_context_data()
@@ -67,17 +66,7 @@ def send_message(request):
             'message': render_to_string('messager/single_message.html', {'message': msg}),
             'sender': sender.username,
         }
-        async_to_sync(channel_layer.group_send)(recipient_username, payload)
+        async_to_sync(channel_layer.group_send)(recipient.username, payload)
 
         return render(request, 'messager/single_message.html', {'message': msg})
     return HttpResponse()
-
-
-@login_required
-@ajax_required
-@require_http_methods(['POST'])
-def receive_message(request):
-    message_id = request.GET['message_id']
-    msg = Message.objects.get(pk=message_id)
-    return render(request, 'messager/single_message.html', {'message': msg})
-
