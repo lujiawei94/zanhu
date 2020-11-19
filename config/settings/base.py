@@ -50,8 +50,7 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "config.urls"
-# https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
-WSGI_APPLICATION = "config.wsgi.application"
+
 
 # APPS
 # ------------------------------------------------------------------------------
@@ -88,7 +87,8 @@ LOCAL_APPS = [
     "zanhu.news.apps.NewsConfig",
     "zanhu.articles.apps.ArticlesConfig",
     "zanhu.qa.apps.QaConfig",
-    "zanhu.messager.apps.MessagerConfig"
+    "zanhu.messager.apps.MessagerConfig",
+    "zanhu.notifications.apps.NotificationsConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
