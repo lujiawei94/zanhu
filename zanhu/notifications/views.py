@@ -46,3 +46,32 @@ def get_latest_notifications(request):
                   {'notifications': notifications})
 
 
+def notification_handler(actor, recipient, verb, action_object, **kwargs):
+    """
+    通知处理器
+    :param actor:           request.user对象
+    :param recipient:       User Instance
+    :param verb:            str 通知类别
+    :param action_object:   Instance 动作对象的实例
+    :param kwargs:          key， id_value等
+    :return:                None
+    """
+    if recipient.username == action_object.user.username:  # 只通知接收者，即recipient == 动作对象的作者
+        key = kwargs.get('key', 'notification')
+        id_value = kwargs.get('id_value', None)
+        # 记录通知内容
+        Notification.objects.create(
+            actor=actor,
+            recipient=recipient,
+            verb=verb,
+            action_object=action_object
+        )
+
+        channel_layer = get_channel_layer()
+        payload = {
+            'type': 'receive',
+            'key': key,
+            'actor_name': actor.username,
+            'id_value': id_value
+        }
+        async_to_sync(channel_layer.group_send)('notifications', payload)

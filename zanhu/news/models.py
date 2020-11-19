@@ -1,9 +1,14 @@
 from __future__ import unicode_literals
 import uuid
 from six import python_2_unicode_compatible
+
 from django.conf import settings
 from django.db import models
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+from zanhu.notifications.views import notification_handler
 
 @python_2_unicode_compatible
 class News(models.Model):
@@ -27,12 +32,27 @@ class News(models.Model):
     def __str__(self):
         return self.content
 
-    def switch_like(self, user):
+    def save(self):
+        super(News, self).save()
+        if not self.reply:
+            channel_layer = get_channel_layer()
+            payload = {
+                'type': 'receive',
+                'key': 'additional_news',
+                'actor_name': self.user,
+            }
+            async_to_sync(channel_layer.group_send)('notifications', payload)
+
+
+    def switch_like(self, user):  # user是哪个用户在点赞
         """点赞或取消赞"""
         if user in self.liked.all():
             self.liked.remove(user)
         else:
             self.liked.add(user)
+            # 通知楼主
+            notification_handler(user, self.user, 'L', self, id_value=str(self.uuid_id), key='social_update')
+
 
     def get_parent(self):
         """返回自关联中的上级记录或者本身"""
@@ -48,12 +68,14 @@ class News(models.Model):
         :param text: 评论内容
         :return: None
         """
+        parent = self.get_parent()
         News.objects.create(
             user=user,
             content=text,
             reply=True,
-            parent=self.get_parent()
+            parent=parent
         )
+        notification_handler(user, parent.user, 'R', parent, id_value=str(parent.uuid_id), key='social_update')
 
     def get_thread(self):
         """关联到当前记录的所有记录"""

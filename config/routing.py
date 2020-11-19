@@ -1,6 +1,7 @@
 from django.urls import path
 from channels.routing import ProtocolTypeRouter, URLRouter
 from zanhu.messager.consumers import MessagesConsumer
+from zanhu.notifications.consumers import NotificationsConsumer
 from channels.auth import AuthMiddlewareStack  # 中间件认证
 # 直接读取到django 中setttings里allowhost允许的访问源站 或者引入OriginValidator（需要手动添加允许访问的源站）【防止websocket csrf攻击】
 from channels.security.websocket import AllowedHostsOriginValidator
@@ -12,6 +13,7 @@ application = ProtocolTypeRouter({
     'websocket': AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter([
+                path('ws/notifications/', NotificationsConsumer),
                 path('ws/<str:username>/', MessagesConsumer),
                 # 可以通过self.scope['url_route']['kwargs']['username'] 获取url中的关键字参数
             ])
