@@ -91,3 +91,13 @@ def post_comment(request):
         parent.reply_this(request.user, post)
         return JsonResponse({'comments': parent.comment_count()})
     return HttpResponseBadRequest('评论不能为空')
+
+@login_required
+@ajax_required
+@require_http_methods(['POST'])
+def update_interactions(request):
+    data_point = request.POST['id_value']
+    news = News.objects.get(pk=data_point)
+    return JsonResponse({'likes': news.count_likers,
+                         'comments': news.comment_count()})
+
