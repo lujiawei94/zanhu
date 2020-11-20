@@ -10,7 +10,7 @@ from django.views.generic import ListView, DetailView, CreateView
 from zanhu.helpers import ajax_required
 from zanhu.qa.models import Question, Answer
 from zanhu.qa.forms import QuestionForm
-
+from zanhu.notifications.views import notification_handler
 
 class QuestionListView(LoginRequiredMixin, ListView):
     model = Question
@@ -134,5 +134,6 @@ def accept_answer(request):
     if answer.question.user.username != request.user.username:
         raise PermissionDenied
     answer.accept_answer()
+    notification_handler(request.user, answer.user, 'W', answer)
     return JsonResponse({'status': 'true'})
 
