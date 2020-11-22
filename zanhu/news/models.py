@@ -32,14 +32,15 @@ class News(models.Model):
     def __str__(self):
         return self.content
 
-    def save(self):
-        super(News, self).save()
+    def save(self, *args, **kwargs):
+        super(News, self).save(*args, **kwargs)
+
         if not self.reply:
             channel_layer = get_channel_layer()
             payload = {
-                'type': 'receive',
-                'key': 'additional_news',
-                'actor_name': self.user,
+                "type": "receive",
+                "key": "additional_news",
+                "actor_name": self.user.username
             }
             async_to_sync(channel_layer.group_send)('notifications', payload)
 
@@ -51,7 +52,8 @@ class News(models.Model):
         else:
             self.liked.add(user)
             # 通知楼主
-            notification_handler(user, self.user, 'L', self, id_value=str(self.uuid_id), key='social_update')
+            if user.username != self.user.username:
+                notification_handler(user, self.user, 'L', self, id_value=str(self.uuid_id), key='social_update')
 
 
     def get_parent(self):

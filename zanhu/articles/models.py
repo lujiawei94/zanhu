@@ -62,10 +62,11 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        self.slug = slugify(self.title)
-        super(Article, self).save()
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # 根据作者和标题生成文章在URL中的别名
+            self.slug = slugify(self.title)
+        super(Article, self).save(*args, **kwargs)
 
     def get_markdown(self):
         """将Markdown文本转化成html"""

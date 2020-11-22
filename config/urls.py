@@ -18,6 +18,7 @@ urlpatterns = [
                   # third party app
                   path('comments/', include('django_comments.urls')),
                   path('markdownx/', include('markdownx.urls')),
+                  path('search/', include('haystack.urls')),
                   # Your stuff: custom urls includes go here
                   path('news/', include('zanhu.news.urls', namespace='news')),
                   path('articles/', include('zanhu.articles.urls', namespace='articles')),

@@ -19,18 +19,19 @@ class NotificationQuerySet(models.query.QuerySet):
     def read(self):
         return self.filter(unread=False)
 
-    def mark_all_as_unread(self, recipient=None):
-        qs = self.read()
-        if recipient:
-            qs = qs.filter(recipient=recipient)
-            return qs.update(unread=True)
-
-
     def mark_all_as_read(self, recipient=None):
+        """标为已读，可以传入接收者参数"""
         qs = self.unread()
         if recipient:
             qs = qs.filter(recipient=recipient)
-            return qs.update(unread=False)
+        return qs.update(unread=False)
+
+    def mark_all_as_unread(self, recipient=None):
+        """标为未读，可以传入接收者参数"""
+        qs = self.read()
+        if recipient:
+            qs = qs.filter(recipient=recipient)
+        return qs.update(unread=True)
 
     def get_most_recent(self, recipient=None):
         qs = self.unread()[:5]
@@ -84,9 +85,10 @@ class Notification(models.Model):
             return f'{self.actor} {self.get_verb_display()} {self.action_object}'
         return f'{self.actor} {self.get_verb_display()}'
 
-    def save(self, forece_insert=False, force_update=False, using=None, update_fields=None):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.slug:
             self.slug = slugify(f'{self.recipient} {self.uuid_id} {self.verb}')
+        super(Notification, self).save()
 
     def mark_as_read(self):
         if self.unread:

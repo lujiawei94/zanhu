@@ -61,7 +61,6 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.humanize",  # Handy template tags
     "django.forms",  # 用于后面重写widget模板
 ]
 THIRD_PARTY_APPS = [
@@ -79,7 +78,8 @@ THIRD_PARTY_APPS = [
     "sorl.thumbnail",
     "taggit",
     "markdownx",
-    "django_comments"
+    "django_comments",
+    "haystack",
 ]
 
 LOCAL_APPS = [
@@ -89,6 +89,7 @@ LOCAL_APPS = [
     "zanhu.qa.apps.QaConfig",
     "zanhu.messager.apps.MessagerConfig",
     "zanhu.notifications.apps.NotificationsConfig",
+    "zanhu.search.apps.SearchConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -318,6 +319,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
 
+# MARKDOWN https://neutronx.github.io/django-markdownx/customization/#settings
+MARKDOWNX_UPLOAD_MAX_SIZE = 5 * 1024 * 1024  # 允许上传的最大图片大小为5MB
+MARKDOWNX_IMAGE_MAX_SIZE = {'size': (1000, 1000), 'quality': 100}  # 图片最大为1000*1000, 不压缩
+
+
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 CORS_URLS_REGEX = r"^/api/.*$"
 # Your stuff...
@@ -335,3 +341,18 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 使用的Elasticsearch搜索引擎
+        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+        # Elasticsearch连接的地址
+        'URL': 'http://127.0.0.1:9200/',
+        # 默认的索引名
+        'INDEX_NAME': 'zanhu',
+    }
+}
+
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 20  # 分页
+# 实时信号量处理器，模型类中数据增加、更新、删除时自动更新索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'

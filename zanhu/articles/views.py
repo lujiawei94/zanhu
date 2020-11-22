@@ -84,4 +84,4 @@ def notify_comment(**kwargs):
 
     notification_handler(actor, obj.user, 'C', obj)
 # 观察者模式
-comment_was_posted.connect(reciver=notify_comment)
+comment_was_posted.connect(receiver=notify_comment)
