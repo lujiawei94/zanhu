@@ -24,7 +24,7 @@ urlpatterns = [
                   path('articles/', include('zanhu.articles.urls', namespace='articles')),
                   path('qa/', include('zanhu.qa.urls', namespace='qa')),
                   path('messages/', include('zanhu.messager.urls', namespace='messages')),
-                  path('notifications/', include('notifications.urls', namespace='notifications')),
+                  path('notifications/', include('zanhu.notifications.urls', namespace='notifications')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development

@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, DetailView, CreateView
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 from zanhu.helpers import ajax_required
 from zanhu.qa.models import Question, Answer
@@ -14,6 +16,7 @@ from zanhu.notifications.views import notification_handler
 
 class QuestionListView(LoginRequiredMixin, ListView):
     model = Question
+    queryset = Question.objects.select_related('user')
     paginate_by = 10
     context_object_name = 'questions'
     template_name = 'qa/question_list.html'
@@ -49,6 +52,7 @@ class UnansweredQuestionListView(QuestionListView):
         return context
 
 
+@method_decorator(cache_page(60 * 60), name='get')
 class CreateQuestionView(LoginRequiredMixin, CreateView):
     """用户提问"""
 
@@ -71,7 +75,11 @@ class QuestionDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'question'
     template_name = 'qa/question_detail.html'
 
+    def get_queryset(self):
+        return Question.objects.select_related('user').filter(pk=self.kwargs['pk'])
 
+
+@method_decorator(cache_page(60 * 60), name='get')
 class CreateAnswerView(LoginRequiredMixin, CreateView):
     """回答问题"""
     model = Answer

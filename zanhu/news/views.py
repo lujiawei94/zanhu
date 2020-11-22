@@ -21,7 +21,7 @@ class NewsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """实现动态过滤"""
-        return News.objects.filter(reply=False)
+        return News.objects.filter(reply=False).select_related('user', 'parent').prefetch_related('liked')
 
     # def get_context_data(self, *, object_list=None, **kwargs):
     #     """除了model定义的模型类中的数据(或已被动态过滤的数据)，添加额外的上下文"""
@@ -69,7 +69,7 @@ def like(request):
 def get_thread(request):
     """获取动态评论，AJAX GET请求"""
     news_id = request.GET['news']
-    news = News.objects.get(pk=news_id)
+    news = News.objects.select_related('user').get(pk=news_id)
     news_html = render_to_string('news/news_single.html', {'news': news})  # 没有评论时
     thread_html = render_to_string('news/news_thread.html', {'thread': news.get_thread()})
     return JsonResponse({

@@ -80,6 +80,7 @@ THIRD_PARTY_APPS = [
     "markdownx",
     "django_comments",
     "haystack",
+    "djcelery_email",
 ]
 
 LOCAL_APPS = [
@@ -111,9 +112,11 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "account_logout"  # "users:redirect" 如果是重定向该怎么处理
+LOGIN_REDIRECT_URL = "news:list"  # "users:redirect" 如果是重定向该怎么处理
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -356,3 +359,4 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 20  # 分页
 # 实时信号量处理器，模型类中数据增加、更新、删除时自动更新索引
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+

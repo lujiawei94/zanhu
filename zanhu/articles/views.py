@@ -2,6 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DeleteView, UpdateView, CreateView, DetailView
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 from django_comments.signals import comment_was_posted
 
@@ -32,6 +34,7 @@ class DraftListView(ArticlesListView):
         return Article.objects.filter(user=self.request.user).get_drafts()
 
 
+@method_decorator(cache_page(60 * 60), name='get')
 class ArticleCreateView(LoginRequiredMixin, CreateView):
     """用户发表文章"""
     model = Article
@@ -59,6 +62,9 @@ class ArticleDetailView(LoginRequiredMixin, DetailView):
     """文章详情"""
     model = Article
     template_name = 'articles/article_detail.html'
+
+    def get_queryset(self):
+        return Article.objects.select_related('user').filter(slug=self.kwargs['slug'])
 
 
 class ArticleEditView(LoginRequiredMixin, AuthorRequireMixin, UpdateView):

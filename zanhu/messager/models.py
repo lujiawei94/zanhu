@@ -10,14 +10,14 @@ from django.contrib.auth import get_user_model
 class MessageQuerySet(models.query.QuerySet):
 
     def get_conversation(self, sender, recipient):
-        qs_one = self.filter(sender=sender, recipient=recipient)
-        qs_two = self.filter(sender=recipient, recipient=sender)
+        qs_one = self.filter(sender=sender, recipient=recipient).select_related('sender', 'recipient')
+        qs_two = self.filter(sender=recipient, recipient=sender).select_related('sender', 'recipient')
         return qs_one.union(qs_two).order_by('created_at')
 
     def get_most_recent_conversation(self, recipient):
         try:
-            qs_sent = self.filter(sender=recipient)  # 当前登录用户发送的消息
-            qs_received = self.filter(recipient=recipient)  # 当前登录用户接收的消息
+            qs_sent = self.filter(sender=recipient).select_related('sender', 'recipient')  # 当前登录用户发送的消息
+            qs_received = self.filter(recipient=recipient).select_related('sender', 'recipient')  # 当前登录用户接收的消息
             qs = qs_received.union(qs_sent).latest('created_at')  # 最新的对话
             if qs.sender == recipient:
                 return qs.recipient  # 登录用户发送的则返回接受者
@@ -34,7 +34,7 @@ class Message(models.Model):
                                   blank=True, null=True, on_delete=models.SET_NULL, verbose_name='接收者')
     message = models.TextField(blank=True, null=True, verbose_name='消息')
     unread = models.BooleanField(default=True, db_index=True, verbose_name='是否未读')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    created_at = models.DateTimeField(db_index=True, auto_now_add=True, verbose_name='创建时间')
     objects = MessageQuerySet.as_manager()
 
     class Meta:

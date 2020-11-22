@@ -15,11 +15,11 @@ class ArticleQuerrySet(models.query.QuerySet):
 
     def get_published(self):
         """获取发表的文章"""
-        return self.filter(status='P')
+        return self.filter(status='P').select_related('user')
 
     def get_drafts(self):
         """获取草稿箱文章"""
-        return self.filter(status='D')
+        return self.filter(status='D').select_related('user')
 
     def get_counted_tags(self):
         """统计所有发表文章中，每个标签的数量>0"""
@@ -50,7 +50,7 @@ class Article(models.Model):
     content = MarkdownxField(verbose_name='内容')
     edited = models.BooleanField(default=False, verbose_name='是否可编辑')
     tags = TaggableManager(help_text='多个标签用,(英文)隔开', verbose_name='标签')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    created_at = models.DateTimeField(db_index=True, auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
     objects = ArticleQuerrySet.as_manager()
 
@@ -73,3 +73,14 @@ class Article(models.Model):
         return markdownify(self.content)
 
 
+"""
+    如何减少SQL语句的执行次数：
+    索引会占用磁盘空间，不必要索引会引起浪费。主键、外键、唯一键已经默认建立索引
+    1.频繁出现在where条件子句的字段 get() filter()
+    2.经常被用来分组（group by）或排序（order_by）的字段
+    3.用于联接的列（主键/外键）上建立索引
+    4.在经常存取的多个列上建立复合索引，但要注意符合索引的建立顺序要按照使用的频率来确定
+    5.对于模型类使用了外键字段查询，返回为查询集时，可通过如下优化：
+# select_related(*key) ForeignKey OneToOneField
+# prefetch_related() ManyToManyField GenericForeignKey
+"""
